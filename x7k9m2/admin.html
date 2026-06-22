@@ -1,0 +1,1524 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TradeAlert Pro — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --orange:      #FF6B00;
+      --orange-dim:  rgba(255,107,0,0.08);
+      --bg:          #0D0D0D;
+      --bg2:         #141414;
+      --bg3:         #1C1C1C;
+      --border:      rgba(255,107,0,0.15);
+      --border-soft: rgba(255,255,255,0.06);
+      --text:        #F0F0F0;
+      --text-muted:  #888;
+      --green:       #00C851;
+      --red:         #cc0000;
+      --radius:      10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN SCREEN ── */
+    .admin-login {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    .login-box h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .login-box p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border-soft);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus { border-color: var(--orange); }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #FF6B00, #FF8C00);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.9; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-soft);
+      color: var(--text-muted);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--orange);
+      color: var(--text);
+    }
+
+    .btn-green {
+      background: linear-gradient(135deg, #00C851, #00a844);
+    }
+
+    .btn-red {
+      background: linear-gradient(135deg, #cc0000, #aa0000);
+    }
+
+    .btn-small {
+      width: auto;
+      padding: 7px 16px;
+      font-size: 12px;
+    }
+
+    .err { color: var(--red); font-size: 12px; margin-bottom: 10px; }
+
+    /* ── MAIN PANEL ── */
+    .admin-panel { display: none; }
+
+    /* Navbar */
+    .admin-nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border-soft);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-nav-logo {
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bolt {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, #FF6B00, #FF8C00);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .admin-email {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-soft);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover { color: var(--text); border-color: var(--orange); }
+
+    /* Main Content */
+    .admin-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--orange);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Search & Filter */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      background: var(--bg2);
+      border: 1px solid var(--border-soft);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+
+    .search-input:focus { border-color: var(--orange); }
+
+    .filter-select {
+      background: var(--bg2);
+      border: 1px solid var(--border-soft);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Users Table */
+    .table-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .table-head {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.5fr;
+      padding: 12px 20px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .user-row {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.5fr;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      align-items: center;
+      transition: background 0.15s;
+    }
+
+    .user-row:last-child { border-bottom: none; }
+    .user-row:hover { background: var(--bg3); }
+
+    .user-email {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-name {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-trial {
+      background: rgba(255,140,0,0.12);
+      color: #FF8C00;
+      border: 1px solid rgba(255,140,0,0.25);
+    }
+
+    .badge-active {
+      background: rgba(0,200,81,0.12);
+      color: var(--green);
+      border: 1px solid rgba(0,200,81,0.25);
+    }
+
+    .badge-expired {
+      background: rgba(204,0,0,0.12);
+      color: #ff6666;
+      border: 1px solid rgba(204,0,0,0.25);
+    }
+
+    .badge-none {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--border-soft);
+    }
+
+    .expiry-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Activate Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+    }
+
+    .modal h3 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 18px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .plan-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .plan-option {
+      background: var(--bg3);
+      border: 2px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .plan-option:hover { border-color: var(--orange); }
+    .plan-option.selected { border-color: var(--orange); background: var(--orange-dim); }
+
+    .plan-option-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .plan-option-price {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .user-info-box {
+      background: var(--bg3);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .info-label { color: var(--text-muted); }
+    .info-value { color: var(--text); font-weight: 600; }
+
+    .loading-row {
+      padding: 40px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      grid-column: 1/-1;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 200;
+      display: none;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .toast.success { border-color: var(--green); color: var(--green); }
+    .toast.error   { border-color: var(--red);   color: #ff6666;      }
+
+    @media (max-width: 640px) {
+      .table-head  { display: none; }
+      .user-row    { grid-template-columns: 1fr; gap: 8px; }
+      .admin-nav   { padding: 0 16px; }
+      .admin-content { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── ADMIN LOGIN ── -->
+<div class="admin-login" id="adminLogin">
+  <div class="login-box">
+    <div style="font-size:36px; margin-bottom:12px;">⚡</div>
+    <h1>Admin Panel</h1>
+    <p>TradeAlert Pro — শুধুমাত্র Admin এর জন্য</p>
+
+    <input type="email" id="adminEmail" class="form-input"
+           placeholder="Admin Email"/>
+    <input type="password" id="adminPassword" class="form-input"
+           placeholder="Password"/>
+    <div id="adminLoginErr" class="err"></div>
+    <button class="btn" onclick="adminLogin()">Login</button>
+  </div>
+</div>
+
+<!-- ── MAIN ADMIN PANEL ── -->
+<div class="admin-panel" id="adminPanel">
+
+  <!-- Navbar -->
+  <div class="admin-nav">
+    <div class="admin-nav-logo">
+      <img src="logo2.png" style="width:32px; height:32px; border-radius:8px;"/>
+      TradeAlert Pro — Admin
+    </div>
+    <div class="admin-email">
+      <span id="adminEmailDisplay"></span>
+      <button class="logout-btn" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="admin-content">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active</div>
+        <div class="stat-value" id="statActive"
+             style="color:#00C851;">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Trial</div>
+        <div class="stat-value" id="statTrial"
+             style="color:#FF8C00;">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Expired</div>
+        <div class="stat-value" id="statExpired"
+             style="color:#cc0000;">—</div>
+      </div>
+    </div>
+
+  <!-- Pricing Control -->
+<div style="
+  background: var(--bg2);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+">
+  <div style="
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  ">
+    💰 Pricing Control
+    <button onclick="savePricing()"
+            id="savePricingBtn"
+            style="
+              background: linear-gradient(135deg,#FF6B00,#FF8C00);
+              color:#fff; border:none; padding:8px 20px;
+              border-radius:8px; font-size:13px;
+              font-weight:700; cursor:pointer;
+            ">
+      💾 Save করো
+    </button>
+  </div>
+
+  <!-- Price Inputs -->
+  <div style="
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  ">
+    <div>
+      <label style="font-size:11px; color:var(--text-muted);
+                    display:block; margin-bottom:6px;">
+        1 MONTH (৳)
+      </label>
+      <input type="number" id="price_monthly"
+             class="form-input" placeholder="500"/>
+    </div>
+    <div>
+      <label style="font-size:11px; color:var(--text-muted);
+                    display:block; margin-bottom:6px;">
+        3 MONTHS (৳)
+      </label>
+      <input type="number" id="price_quarterly"
+             class="form-input" placeholder="1200"/>
+    </div>
+    <div>
+      <label style="font-size:11px; color:var(--text-muted);
+                    display:block; margin-bottom:6px;">
+        6 MONTHS (৳)
+      </label>
+      <input type="number" id="price_biannual"
+             class="form-input" placeholder="2000"/>
+    </div>
+    <div>
+      <label style="font-size:11px; color:var(--text-muted);
+                    display:block; margin-bottom:6px;">
+        1 YEAR (৳)
+      </label>
+      <input type="number" id="price_yearly"
+             class="form-input" placeholder="3500"/>
+    </div>
+  </div>
+
+  <!-- USD Inputs -->
+  <div style="
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  ">
+    <div>
+      <label style="font-size:11px; color:var(--text-muted);
+                    display:block; margin-bottom:6px;">
+        1 MONTH (USD ~)
+      </label>
+      <input type="text" id="usd_monthly"
+             class="form-input" placeholder="4.5"/>
+    </div>
+    <div>
+      <label style="font-size:11px; color:var(--text-muted);
+                    display:block; margin-bottom:6px;">
+        3 MONTHS (USD ~)
+      </label>
+      <input type="text" id="usd_quarterly"
+             class="form-input" placeholder="11"/>
+    </div>
+    <div>
+      <label style="font-size:11px; color:var(--text-muted);
+                    display:block; margin-bottom:6px;">
+        6 MONTHS (USD ~)
+      </label>
+      <input type="text" id="usd_biannual"
+             class="form-input" placeholder="18"/>
+    </div>
+    <div>
+      <label style="font-size:11px; color:var(--text-muted);
+                    display:block; margin-bottom:6px;">
+        1 YEAR (USD ~)
+      </label>
+      <input type="text" id="usd_yearly"
+             class="form-input" placeholder="32"/>
+    </div>
+  </div>
+
+  <!-- Offer Section -->
+  <div style="
+    border-top: 1px solid var(--border-soft);
+    padding-top: 20px;
+  ">
+    <div style="font-size:14px; font-weight:700;
+                margin-bottom:14px; color:#FF8C00;">
+      🎉 Special Offer
+    </div>
+    <div style="display:flex; gap:12px; align-items:center;
+                margin-bottom:12px; flex-wrap:wrap;">
+      <label style="display:flex; align-items:center; gap:8px;
+                    font-size:13px; cursor:pointer;">
+        <input type="checkbox" id="offer_active"
+               style="width:16px; height:16px; accent-color:#FF6B00;"/>
+        Offer চালু করো
+      </label>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:13px; color:var(--text-muted);">
+          Discount:
+        </span>
+        <input type="number" id="offer_discount"
+               class="form-input"
+               style="width:80px;"
+               placeholder="20"
+               min="0" max="90"/>
+        <span style="font-size:13px; color:var(--text-muted);">%</span>
+      </div>
+    </div>
+    <input type="text" id="offer_text"
+           class="form-input"
+           placeholder="🎉 Eid Special! সব plan এ ২০% ছাড়! আজই নিন।"
+           style="width:100%;"/>
+  </div>
+
+  <div id="pricingSaveMsg"
+       style="margin-top:12px; font-size:13px;"></div>
+</div>
+
+<!-- News Management -->
+<div style="
+  background: var(--bg2);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+">
+  <div style="
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  ">
+    📅 News Management
+    <button onclick="saveNews()"
+            id="saveNewsBtn"
+            style="
+              background: linear-gradient(135deg,#FF6B00,#FF8C00);
+              color:#fff; border:none; padding:8px 20px;
+              border-radius:8px; font-size:13px;
+              font-weight:700; cursor:pointer;
+            ">
+      💾 Save করো
+    </button>
+  </div>
+
+  <!-- Add News Form -->
+  <div style="
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  ">
+    <div style="font-size:13px; font-weight:700;
+                color:#FF6B00; margin-bottom:16px;">
+      ➕ নতুন News যোগ করো
+    </div>
+
+    <div style="display:grid;
+                grid-template-columns: 1fr 1fr;
+                gap:12px; margin-bottom:12px;">
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);
+                      display:block; margin-bottom:6px;">
+          NEWS TITLE
+        </label>
+        <input type="text" id="newsTitle"
+               class="form-input"
+               placeholder="Non-Farm Payrolls"/>
+      </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);
+                      display:block; margin-bottom:6px;">
+          CURRENCY
+        </label>
+        <select id="newsCurrency" class="form-input">
+          <option value="USD">🇺🇸 USD</option>
+          <option value="EUR">🇪🇺 EUR</option>
+          <option value="GBP">🇬🇧 GBP</option>
+          <option value="JPY">🇯🇵 JPY</option>
+          <option value="AUD">🇦🇺 AUD</option>
+          <option value="CAD">🇨🇦 CAD</option>
+          <option value="CHF">🇨🇭 CHF</option>
+          <option value="NZD">🇳🇿 NZD</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap:12px; margin-bottom:12px;">
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);
+                      display:block; margin-bottom:6px;">
+          DATE & TIME
+        </label>
+        <input type="datetime-local" id="newsDate"
+               class="form-input"/>
+      </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);
+                      display:block; margin-bottom:6px;">
+          IMPACT
+        </label>
+        <select id="newsImpact" class="form-input">
+          <option value="High">🔴 High</option>
+          <option value="Medium">🟡 Medium</option>
+          <option value="Low">⚪ Low</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);
+                      display:block; margin-bottom:6px;">
+          FORECAST
+        </label>
+        <input type="text" id="newsForecast"
+               class="form-input"
+               placeholder="180K"/>
+      </div>
+    </div>
+
+    <div style="display:grid;
+                grid-template-columns: 1fr 1fr;
+                gap:12px; margin-bottom:16px;">
+      <div>
+        <label style="font-size:11px; color:var(--text-muted);
+                      display:block; margin-bottom:6px;">
+          PREVIOUS
+        </label>
+        <input type="text" id="newsPrevious"
+               class="form-input"
+               placeholder="175K"/>
+      </div>
+      <div style="display:flex; align-items:flex-end;">
+        <button onclick="addNewsItem()"
+                style="
+                  width:100%;
+                  background: var(--bg2);
+                  border: 1px solid var(--border);
+                  color: var(--orange);
+                  padding: 11px;
+                  border-radius: var(--radius);
+                  font-size: 13px;
+                  font-weight: 700;
+                  cursor: pointer;
+                ">
+          ➕ List এ যোগ করো
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- News List -->
+  <div id="newsList" style="
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+  ">
+    <div style="text-align:center; color:var(--text-muted);
+                padding:20px; font-size:13px;">
+      ⏳ Loading...
+    </div>
+  </div>
+
+  <div id="newsSaveMsg"
+       style="margin-top:12px; font-size:13px;"></div>
+</div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <input type="text" class="search-input"
+             id="searchInput"
+             placeholder="🔍 Email বা নাম দিয়ে search করো..."
+             oninput="filterUsers()"/>
+      <select class="filter-select" id="filterSelect"
+              onchange="filterUsers()">
+        <option value="all">সব Users</option>
+        <option value="active">Active</option>
+        <option value="trial">Trial</option>
+        <option value="expired">Expired</option>
+      </select>
+      <button class="btn btn-small" onclick="loadUsers()"
+              style="width:auto; padding:10px 20px;">
+        🔄 Refresh
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div class="table-head">
+        <div>User</div>
+        <div>Status</div>
+        <div>Expiry</div>
+        <div>Plan</div>
+        <div>Actions</div>
+      </div>
+      <div id="usersContainer">
+        <div class="loading-row">⏳ Loading users...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── ACTIVATE MODAL ── -->
+<div class="modal-overlay" id="activateModal">
+  <div class="modal">
+    <button class="modal-close"
+            onclick="closeActivateModal()">✕</button>
+    <h3>Subscription Activate</h3>
+    <p class="modal-sub">User এর subscription manually activate করো</p>
+
+    <!-- User Info -->
+    <div class="user-info-box">
+      <div>
+        <span class="info-label">Email: </span>
+        <span class="info-value" id="modalUserEmail"></span>
+      </div>
+      <div>
+        <span class="info-label">Name: </span>
+        <span class="info-value" id="modalUserName"></span>
+      </div>
+      <div>
+        <span class="info-label">Current Status: </span>
+        <span class="info-value" id="modalCurrentStatus"></span>
+      </div>
+    </div>
+
+    <!-- Plan Select -->
+    <div style="font-size:12px; color:var(--text-muted);
+                margin-bottom:10px; font-weight:600;">
+      PLAN SELECT করো
+    </div>
+    <div class="plan-grid">
+      <div class="plan-option" onclick="selectPlan('monthly', this)">
+        <div class="plan-option-name">1 Month</div>
+        <div class="plan-option-price">৳99</div>
+      </div>
+      <div class="plan-option" onclick="selectPlan('quarterly', this)">
+        <div class="plan-option-name">3 Months</div>
+        <div class="plan-option-price">৳149</div>
+      </div>
+      <div class="plan-option" onclick="selectPlan('biannual', this)">
+        <div class="plan-option-name">6 Months</div>
+        <div class="plan-option-price">৳299</div>
+      </div>
+      <div class="plan-option" onclick="selectPlan('yearly', this)">
+        <div class="plan-option-name">1 Year</div>
+        <div class="plan-option-price">৳499</div>
+      </div>
+    </div>
+
+    <input type="hidden" id="modalUserId"/>
+    <input type="hidden" id="selectedPlanKey"/>
+
+    <div id="activateErr" class="err"></div>
+
+    <button class="btn btn-green" id="activateBtn"
+            onclick="activateUser()">
+      ✅ Activate করো
+    </button>
+  </div>
+</div>
+
+<!-- ── DEACTIVATE CONFIRM MODAL ── -->
+<div class="modal-overlay" id="deactivateModal">
+  <div class="modal">
+    <button class="modal-close"
+            onclick="document.getElementById('deactivateModal')
+                     .classList.remove('open')">✕</button>
+    <h3>⚠️ Deactivate করবে?</h3>
+    <p class="modal-sub">
+      এই user এর subscription বন্ধ হয়ে যাবে।
+    </p>
+    <div class="user-info-box" style="margin-bottom:20px;">
+      <span class="info-label">Email: </span>
+      <span class="info-value" id="deactivateEmail"></span>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-red" onclick="confirmDeactivate()">
+        হ্যাঁ, Deactivate করো
+      </button>
+      <button class="btn btn-outline"
+              onclick="document.getElementById('deactivateModal')
+                       .classList.remove('open')">
+        বাতিল
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ✅ তোমার Firebase config এখানে বসাও
+  const firebaseConfig = {
+  apiKey: "AIzaSyAwRZfzHpwCId-vpTY33s97jFV8I3KDXRw",
+  authDomain: "tradealert-pro.firebaseapp.com",
+  projectId: "tradealert-pro",
+  storageBucket: "tradealert-pro.firebasestorage.app",
+  messagingSenderId: "1054738160092",
+  appId: "1:1054738160092:web:57d9dc5204b64b8f7d9719"
+};
+
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // Admin email — শুধু এই email login করতে পারবে
+  const ADMIN_EMAIL = "sagorkhadmkhan@gmail.com";
+
+  const PLANS = {
+    monthly:   { name: "1 Month",  days: 30  },
+    quarterly: { name: "3 Months", days: 90  },
+    biannual:  { name: "6 Months", days: 180 },
+    yearly:    { name: "1 Year",   days: 365 }
+  };
+
+  let allUsers        = [];
+  let deactivateUid   = null;
+
+  // ── AUTH STATE ──
+  onAuthStateChanged(auth, user => {
+    if (user && user.email === ADMIN_EMAIL) {
+      document.getElementById("adminLogin").style.display  = "none";
+      document.getElementById("adminPanel").style.display  = "block";
+      document.getElementById("adminEmailDisplay").textContent = user.email;
+      loadUsers();
+      loadPricingSettings();
+    } else if (user) {
+      // Admin না হলে logout
+      signOut(auth);
+      showError("adminLoginErr", "⚠️ তুমি Admin না।");
+    }
+  });
+
+  // ── ADMIN LOGIN ──
+  window.adminLogin = async function() {
+    const email    = document.getElementById("adminEmail").value.trim();
+    const password = document.getElementById("adminPassword").value;
+    const errEl    = document.getElementById("adminLoginErr");
+    errEl.textContent = "";
+
+    if (email !== ADMIN_EMAIL) {
+      errEl.textContent = "⚠️ এই email Admin না।";
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      errEl.textContent = "⚠️ Email বা Password ভুল।";
+    }
+  };
+
+  // ── LOGOUT ──
+  window.adminLogout = async function() {
+    await signOut(auth);
+    document.getElementById("adminLogin").style.display = "flex";
+    document.getElementById("adminPanel").style.display = "none";
+  };
+
+  // ── LOAD USERS ──
+  window.loadUsers = async function() {
+    const container = document.getElementById("usersContainer");
+    container.innerHTML =
+      '<div class="loading-row">⏳ Loading...</div>';
+
+    try {
+      const snapshot = await getDocs(collection(db, "users"));
+      allUsers = [];
+
+      snapshot.forEach(docSnap => {
+        allUsers.push({ uid: docSnap.id, ...docSnap.data() });
+      });
+
+      updateStats();
+      renderUsers(allUsers);
+
+    } catch (error) {
+      container.innerHTML =
+        '<div class="loading-row">❌ Load করতে সমস্যা হয়েছে।</div>';
+    }
+  };
+
+  // ── STATS ──
+  function updateStats() {
+    const now     = Date.now();
+    let active    = 0, trial = 0, expired = 0;
+
+    allUsers.forEach(u => {
+      const status = u.subscriptionStatus;
+      if (status === "active" && u.subscriptionExpiry > now) {
+        active++;
+      } else if (status === "trial" && u.trialEnd > now) {
+        trial++;
+      } else {
+        expired++;
+      }
+    });
+
+    document.getElementById("statTotal").textContent   = allUsers.length;
+    document.getElementById("statActive").textContent  = active;
+    document.getElementById("statTrial").textContent   = trial;
+    document.getElementById("statExpired").textContent = expired;
+  }
+
+  // ── RENDER USERS ──
+  function renderUsers(users) {
+    const container = document.getElementById("usersContainer");
+    const now       = Date.now();
+
+    if (users.length === 0) {
+      container.innerHTML =
+        '<div class="loading-row">কোনো user নেই।</div>';
+      return;
+    }
+
+    container.innerHTML = users.map(user => {
+      const status  = user.subscriptionStatus;
+      const expiry  = user.subscriptionExpiry || user.trialEnd || 0;
+      const isValid = expiry > now;
+
+      let badgeClass = "badge-none";
+      let badgeText  = "No Sub";
+
+      if (status === "active" && isValid) {
+        badgeClass = "badge-active";
+        badgeText  = "✅ Active";
+      } else if (status === "trial" && isValid) {
+        badgeClass = "badge-trial";
+        badgeText  = "🟡 Trial";
+      } else if (status === "trial" && !isValid) {
+        badgeClass = "badge-expired";
+        badgeText  = "Trial Expired";
+      } else if (status === "active" && !isValid) {
+        badgeClass = "badge-expired";
+        badgeText  = "Sub Expired";
+      }
+
+      const expiryStr = expiry
+        ? new Date(expiry).toLocaleDateString("en-BD",
+            { day:"2-digit", month:"short", year:"numeric" })
+        : "—";
+
+      const planStr = user.plan || "—";
+
+      return `
+        <div class="user-row">
+          <div>
+            <div class="user-email">${user.email || "—"}</div>
+            <div class="user-name">${user.name || ""}</div>
+          </div>
+          <div>
+            <span class="status-badge ${badgeClass}">
+              ${badgeText}
+            </span>
+          </div>
+          <div class="expiry-text">${expiryStr}</div>
+          <div style="font-size:12px; color:var(--text-muted);">
+            ${planStr}
+          </div>
+          <div class="actions">
+            <button class="btn btn-green btn-small"
+                    onclick="openActivateModal(
+                      '${user.uid}',
+                      '${user.email}',
+                      '${user.name || ""}',
+                      '${badgeText}'
+                    )">
+              Activate
+            </button>
+            <button class="btn btn-red btn-small"
+                    onclick="openDeactivateModal(
+                      '${user.uid}',
+                      '${user.email}'
+                    )">
+              Block
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // ── FILTER ──
+  window.filterUsers = function() {
+    const search = document.getElementById("searchInput")
+                           .value.toLowerCase();
+    const filter = document.getElementById("filterSelect").value;
+    const now    = Date.now();
+
+    let filtered = allUsers.filter(u => {
+      const matchSearch =
+        (u.email || "").toLowerCase().includes(search) ||
+        (u.name  || "").toLowerCase().includes(search);
+
+      const status  = u.subscriptionStatus;
+      const expiry  = u.subscriptionExpiry || u.trialEnd || 0;
+      const isValid = expiry > now;
+
+      let matchFilter = true;
+      if (filter === "active") {
+        matchFilter = status === "active" && isValid;
+      } else if (filter === "trial") {
+        matchFilter = status === "trial" && isValid;
+      } else if (filter === "expired") {
+        matchFilter = !isValid;
+      }
+
+      return matchSearch && matchFilter;
+    });
+
+    renderUsers(filtered);
+  };
+
+  // ── ACTIVATE MODAL ──
+  window.openActivateModal = function(uid, email, name, status) {
+    document.getElementById("modalUserId").value         = uid;
+    document.getElementById("modalUserEmail").textContent = email;
+    document.getElementById("modalUserName").textContent  = name || "—";
+    document.getElementById("modalCurrentStatus").textContent = status;
+    document.getElementById("selectedPlanKey").value     = "";
+    document.getElementById("activateErr").textContent   = "";
+
+    // Plan selection reset
+    document.querySelectorAll(".plan-option")
+            .forEach(el => el.classList.remove("selected"));
+
+    document.getElementById("activateModal").classList.add("open");
+  };
+
+  window.closeActivateModal = function() {
+    document.getElementById("activateModal").classList.remove("open");
+  };
+
+  window.selectPlan = function(planKey, el) {
+    document.querySelectorAll(".plan-option")
+            .forEach(e => e.classList.remove("selected"));
+    el.classList.add("selected");
+    document.getElementById("selectedPlanKey").value = planKey;
+  };
+
+  // ── ACTIVATE USER ──
+  window.activateUser = async function() {
+    const uid     = document.getElementById("modalUserId").value;
+    const planKey = document.getElementById("selectedPlanKey").value;
+    const errEl   = document.getElementById("activateErr");
+    const btn     = document.getElementById("activateBtn");
+
+    errEl.textContent = "";
+
+    if (!planKey) {
+      errEl.textContent = "⚠️ আগে একটা plan select করো।";
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = "Activating...";
+
+    const plan   = PLANS[planKey];
+    const expiry = Date.now() + plan.days * 24 * 60 * 60 * 1000;
+
+    try {
+      await updateDoc(doc(db, "users", uid), {
+        subscriptionStatus: "active",
+        subscriptionExpiry: expiry,
+        plan:               plan.name
+      });
+
+      closeActivateModal();
+      showToast(`✅ ${plan.name} Activated!`, "success");
+      await loadUsers();
+
+    } catch (error) {
+      errEl.textContent = "⚠️ Activate করতে সমস্যা হয়েছে।";
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = "✅ Activate করো";
+    }
+  };
+
+  // ── DEACTIVATE ──
+  window.openDeactivateModal = function(uid, email) {
+    deactivateUid = uid;
+    document.getElementById("deactivateEmail").textContent = email;
+    document.getElementById("deactivateModal").classList.add("open");
+  };
+
+  window.confirmDeactivate = async function() {
+    if (!deactivateUid) return;
+
+    try {
+      await updateDoc(doc(db, "users", deactivateUid), {
+        subscriptionStatus: "blocked",
+        subscriptionExpiry: 0
+      });
+
+      document.getElementById("deactivateModal")
+              .classList.remove("open");
+      showToast("🚫 User blocked!", "error");
+      await loadUsers();
+
+    } catch (error) {
+      showToast("❌ সমস্যা হয়েছে।", "error");
+    }
+  };
+
+  // ── TOAST ──
+  function showToast(msg, type) {
+    const toast      = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.className  = `toast ${type}`;
+    toast.style.display = "block";
+    setTimeout(() => { toast.style.display = "none"; }, 3000);
+  }
+
+  function showError(id, msg) {
+    document.getElementById(id).textContent = msg;
+  }
+
+  // ── PRICING LOAD ──
+async function loadPricingSettings() {
+  try {
+    const snap = await getDoc(doc(db, "settings", "pricing"));
+    if (snap.exists()) {
+      const d = snap.data();
+      document.getElementById("price_monthly").value   = d.monthly_price   || 500;
+      document.getElementById("price_quarterly").value = d.quarterly_price || 1200;
+      document.getElementById("price_biannual").value  = d.biannual_price  || 2000;
+      document.getElementById("price_yearly").value    = d.yearly_price    || 3500;
+      document.getElementById("usd_monthly").value     = d.monthly_usd     || "4.5";
+      document.getElementById("usd_quarterly").value   = d.quarterly_usd   || "11";
+      document.getElementById("usd_biannual").value    = d.biannual_usd    || "18";
+      document.getElementById("usd_yearly").value      = d.yearly_usd      || "32";
+      document.getElementById("offer_active").checked  = d.offer_active    || false;
+      document.getElementById("offer_discount").value  = d.offer_discount  || 0;
+      document.getElementById("offer_text").value      = d.offer_text      || "";
+    }
+  } catch (error) {
+    console.error("Pricing load error:", error);
+  }
+}
+
+// ── PRICING SAVE ──
+window.savePricing = async function() {
+  const btn    = document.getElementById("savePricingBtn");
+  const msgEl  = document.getElementById("pricingSaveMsg");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+
+  try {
+    await setDoc(doc(db, "settings", "pricing"), {
+      monthly_price:   parseInt(document.getElementById("price_monthly").value)   || 500,
+      quarterly_price: parseInt(document.getElementById("price_quarterly").value) || 1200,
+      biannual_price:  parseInt(document.getElementById("price_biannual").value)  || 2000,
+      yearly_price:    parseInt(document.getElementById("price_yearly").value)    || 3500,
+      monthly_usd:     document.getElementById("usd_monthly").value   || "4.5",
+      quarterly_usd:   document.getElementById("usd_quarterly").value || "11",
+      biannual_usd:    document.getElementById("usd_biannual").value  || "18",
+      yearly_usd:      document.getElementById("usd_yearly").value    || "32",
+      offer_active:    document.getElementById("offer_active").checked,
+      offer_discount:  parseInt(document.getElementById("offer_discount").value) || 0,
+      offer_text:      document.getElementById("offer_text").value || ""
+    });
+
+    msgEl.style.color   = "#00C851";
+    msgEl.textContent   = "✅ Pricing save হয়েছে! Website এ দেখাবে।";
+    showToast("✅ Pricing updated!", "success");
+
+  } catch (error) {
+    msgEl.style.color   = "#cc0000";
+    msgEl.textContent   = "❌ Save করতে সমস্যা হয়েছে।";
+  } finally {
+    btn.disabled        = false;
+    btn.textContent     = "💾 Save করো";
+  }
+};
+
+// ── NEWS MANAGEMENT ──
+let newsItems = [];
+
+// News load করো
+async function loadNewsItems() {
+  try {
+    const snap = await getDoc(doc(db, "settings", "news"));
+    if (snap.exists()) {
+      newsItems = snap.data().items || [];
+    } else {
+      newsItems = [];
+    }
+    renderNewsList();
+  } catch(e) {
+    console.error("News load error:", e);
+  }
+}
+
+// News list render করো
+function renderNewsList() {
+  const container = document.getElementById("newsList");
+  if (newsItems.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; color:var(--text-muted);
+                  padding:20px; font-size:13px;">
+        কোনো news নেই। উপরে form থেকে যোগ করো।
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = newsItems.map((item, index) => {
+    const eventTime = new Date(item.date);
+    const timeStr   = eventTime.toLocaleString("en-BD");
+    const impactColor = item.impact === "High"   ? "#cc0000" :
+                        item.impact === "Medium" ? "#FF8C00" : "#555";
+    const flags = {
+      USD:"🇺🇸", EUR:"🇪🇺", GBP:"🇬🇧",
+      JPY:"🇯🇵", AUD:"🇦🇺", CAD:"🇨🇦",
+      CHF:"🇨🇭", NZD:"🇳🇿"
+    };
+
+    return `
+      <div style="
+        background: var(--bg3);
+        border: 1px solid var(--border-soft);
+        border-left: 3px solid ${impactColor};
+        border-radius: 8px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      ">
+        <div style="flex:1;">
+          <div style="font-size:12px; color:#FF8C00;
+                      font-weight:700; margin-bottom:4px;">
+            ${flags[item.currency] || "🌍"} ${item.currency} —
+            <span style="color:${impactColor};">
+              ${item.impact}
+            </span>
+          </div>
+          <div style="font-size:13px; color:#fff;
+                      font-weight:600; margin-bottom:4px;">
+            ${item.title}
+          </div>
+          <div style="font-size:11px; color:#666;">
+            📅 ${timeStr}
+            ${item.forecast ? ` · Forecast: ${item.forecast}` : ""}
+            ${item.previous ? ` · Previous: ${item.previous}` : ""}
+          </div>
+        </div>
+        <button onclick="deleteNewsItem(${index})"
+                style="
+                  background: rgba(204,0,0,0.15);
+                  border: 1px solid rgba(204,0,0,0.3);
+                  color: #ff6666;
+                  padding: 6px 12px;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  cursor: pointer;
+                  flex-shrink: 0;
+                ">
+          🗑️ Delete
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+// News item যোগ করো (list এ)
+window.addNewsItem = function() {
+  const title    = document.getElementById("newsTitle").value.trim();
+  const currency = document.getElementById("newsCurrency").value;
+  const date     = document.getElementById("newsDate").value;
+  const impact   = document.getElementById("newsImpact").value;
+  const forecast = document.getElementById("newsForecast").value.trim();
+  const previous = document.getElementById("newsPrevious").value.trim();
+
+  if (!title || !date) {
+    alert("⚠️ Title এবং Date দাও।");
+    return;
+  }
+
+  newsItems.push({
+    title,
+    currency,
+    date:     new Date(date).toISOString(),
+    impact,
+    forecast,
+    previous,
+    country:  currency
+  });
+
+  // Form clear করো
+  document.getElementById("newsTitle").value    = "";
+  document.getElementById("newsDate").value     = "";
+  document.getElementById("newsForecast").value = "";
+  document.getElementById("newsPrevious").value = "";
+
+  renderNewsList();
+  showToast("✅ List এ যোগ হয়েছে। Save করতে ভুলো না!", "success");
+};
+
+// News item delete করো
+window.deleteNewsItem = function(index) {
+  newsItems.splice(index, 1);
+  renderNewsList();
+};
+
+// News Firestore এ save করো
+window.saveNews = async function() {
+  const btn   = document.getElementById("saveNewsBtn");
+  const msgEl = document.getElementById("newsSaveMsg");
+
+  btn.disabled    = true;
+  btn.textContent = "Saving...";
+
+  try {
+    await setDoc(doc(db, "settings", "news"), {
+      items:     newsItems,
+      updatedAt: new Date().toISOString()
+    });
+
+    msgEl.style.color   = "#00C851";
+    msgEl.textContent   = "✅ News save হয়েছে! Website এ দেখাবে।";
+    showToast("✅ News updated!", "success");
+
+  } catch(e) {
+    msgEl.style.color   = "#cc0000";
+    msgEl.textContent   = "❌ Save করতে সমস্যা হয়েছে।";
+  } finally {
+    btn.disabled        = false;
+    btn.textContent     = "💾 Save করো";
+  }
+};
+</script>
+</body>
+</html>
