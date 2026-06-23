@@ -1,0 +1,2421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="google-site-verification" content="FqEayczVjJBIU6bJuaOyGRfEwopl95xgVYdM9hULv-o" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TradeAlert Pro — Trading News Alerts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --orange:       #FF6B00;
+      --orange-light: #FF8C00;
+      --orange-glow:  rgba(255,107,0,0.18);
+      --orange-dim:   rgba(255,107,0,0.08);
+      --bg:           #0D0D0D;
+      --bg2:          #141414;
+      --bg3:          #1C1C1C;
+      --border:       rgba(255,107,0,0.15);
+      --border-soft:  rgba(255,255,255,0.06);
+      --text:         #F0F0F0;
+      --text-muted:   #888888;
+      --text-dim:     #555555;
+      --green:        #00C851;
+      --radius:       12px;
+      --radius-lg:    20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 64px;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo .bolt {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--orange), var(--orange-light));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--orange);
+      color: #fff !important;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600 !important;
+      font-size: 14px !important;
+      transition: opacity 0.2s !important;
+    }
+
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* radial glow bg */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(255,107,0,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--orange-dim);
+      border: 1px solid var(--border);
+      color: var(--orange-light);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 72px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      max-width: 820px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(90deg, var(--orange), var(--orange-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--orange), var(--orange-light));
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(255,107,0,0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,107,0,0.45);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-muted);
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 15px;
+      border: 1px solid var(--border-soft);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--orange);
+      color: var(--text);
+    }
+
+    .hero-note {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .hero-note span {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* ── NOTIFICATION MOCKUP ── */
+    .mockup-wrap {
+      margin-top: 60px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .notification-card {
+      background: linear-gradient(135deg, #FF6B00, #FF8C00);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      max-width: 380px;
+      box-shadow: 0 12px 48px rgba(255,107,0,0.4);
+      animation: floatUp 3s ease-in-out infinite;
+      text-align: left;
+    }
+
+    @keyframes floatUp {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+
+    .notif-icon {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .notif-body { flex: 1; }
+
+    .notif-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .notif-main {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.4;
+    }
+
+    .notif-time {
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+      margin-top: 6px;
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #cc0000;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      box-shadow: 0 2px 12px rgba(204,0,0,0.5);
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      background: var(--bg2);
+    }
+
+    .stat-item {
+      flex: 1;
+      max-width: 200px;
+      text-align: center;
+      padding: 28px 16px;
+      border-right: 1px solid var(--border-soft);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--orange);
+      letter-spacing: -1px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── SECTION ── */
+    section {
+      padding: 96px 24px;
+    }
+
+    .section-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .section-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 500px;
+      line-height: 1.7;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2px;
+      margin-top: 56px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .how-step {
+      background: var(--bg2);
+      padding: 36px 28px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .how-step:hover { background: var(--bg3); }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--orange);
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .step-icon {
+      font-size: 32px;
+      margin-bottom: 14px;
+    }
+
+    .step-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── FEATURES ── */
+    .features-bg { background: var(--bg2); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+
+    .feature-card {
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border);
+      transform: translateY(-3px);
+    }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: var(--orange-dim);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .feature-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── PRICING ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+      align-items: end;
+    }
+
+    .plan-card {
+      background: var(--bg2);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px 32px;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    .plan-card:hover { border-color: var(--border); }
+
+    .plan-card.popular {
+      border: 2px solid var(--orange);
+      background: var(--bg3);
+      transform: scale(1.03);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--orange);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .plan-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .plan-price {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .plan-currency {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--orange);
+    }
+
+    .plan-amount {
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .plan-per {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    .plan-divider {
+      border: none;
+      border-top: 1px solid var(--border-soft);
+      margin: 20px 0;
+    }
+
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .plan-features li {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--orange);
+      font-weight: 700;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .plan-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .plan-btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .plan-btn-outline:hover {
+      border-color: var(--orange);
+      color: var(--text);
+    }
+
+    .plan-btn-solid {
+      background: linear-gradient(135deg, var(--orange), var(--orange-light));
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(255,107,0,0.3);
+    }
+
+    .plan-btn-solid:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .savings-tag {
+      display: inline-block;
+      background: rgba(0,200,81,0.12);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+    }
+
+    /* ── PAYMENT SECTION ── */
+    .payment-section { background: var(--bg2); }
+
+    .payment-cards {
+      display: flex;
+      gap: 16px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .payment-card {
+      background: var(--bg);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      flex: 1;
+      min-width: 260px;
+      transition: border-color 0.2s;
+    }
+
+    .payment-card:hover { border-color: var(--border); }
+
+    .payment-logo {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .payment-name {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .payment-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .crypto-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .crypto-tag {
+      background: var(--orange-dim);
+      border: 1px solid var(--border);
+      color: var(--orange-light);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    /* ── FAQ ── */
+    .faq-list {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .faq-item {
+      background: var(--bg2);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .faq-q {
+      padding: 20px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      user-select: none;
+    }
+
+    .faq-q:hover { color: var(--orange); }
+
+    .faq-arrow {
+      color: var(--orange);
+      font-size: 18px;
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.2s;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      padding: 0 24px;
+    }
+
+    .faq-item.open .faq-a {
+      max-height: 200px;
+      padding: 0 24px 20px;
+    }
+
+    .faq-item.open .faq-arrow { transform: rotate(45deg); }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+      padding: 80px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-banner::before {
+      content: '⚡';
+      position: absolute;
+      font-size: 300px;
+      opacity: 0.05;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .cta-banner h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1.5px;
+      margin-bottom: 14px;
+    }
+
+    .cta-banner p {
+      font-size: 16px;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 32px;
+    }
+
+    .btn-white {
+      background: #fff;
+      color: var(--orange);
+      padding: 14px 36px;
+      border-radius: var(--radius);
+      font-weight: 800;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .btn-white:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border-soft);
+      padding: 48px 24px 32px;
+    }
+
+    .footer-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+
+    .footer-brand .nav-logo { margin-bottom: 10px; }
+
+    .footer-tagline {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 220px;
+      line-height: 1.6;
+    }
+
+    .footer-links h4 {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+
+    .footer-links ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .footer-links li a {
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .footer-links li a:hover { color: var(--orange); }
+
+    .footer-bottom {
+      max-width: 1080px;
+      margin: 32px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .footer-copy span { color: var(--orange); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      max-width: 440px;
+      width: 100%;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal h3 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border-soft);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus { border-color: var(--orange); }
+
+    .modal-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--orange), var(--orange-light));
+      color: #fff;
+      border: none;
+      padding: 13px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .modal-btn:hover { opacity: 0.9; }
+
+    .modal-switch {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .modal-switch a {
+      color: var(--orange);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .trial-notice {
+      background: rgba(0,200,81,0.08);
+      border: 1px solid rgba(0,200,81,0.2);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--green);
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .stats-bar { flex-wrap: wrap; }
+      .stat-item { min-width: 50%; border-right: none; border-bottom: 1px solid var(--border-soft); }
+      .plan-card.popular { transform: scale(1); }
+      .footer-inner { flex-direction: column; }
+    }
+  </style>
+  <!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ✅ তোমার Firebase config এখানে বসাও
+  const firebaseConfig = {
+  apiKey: "AIzaSyAwRZfzHpwCId-vpTY33s97jFV8I3KDXRw",
+  authDomain: "tradealert-pro.firebaseapp.com",
+  projectId: "tradealert-pro",
+  storageBucket: "tradealert-pro.firebasestorage.app",
+  messagingSenderId: "1054738160092",
+  appId: "1:1054738160092:web:57d9dc5204b64b8f7d9719"
+};
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ── REGISTER ──
+  window.handleRegister = async function () {
+    const name     = document.getElementById("regName").value.trim();
+    const email    = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value;
+    const btn      = document.getElementById("regBtn");
+    const errBox   = document.getElementById("regError");
+
+    errBox.textContent = "";
+
+    if (!name || !email || !password) {
+      errBox.textContent = "⚠️ সব field পূরণ করো।";
+      return;
+    }
+    if (password.length < 8) {
+      errBox.textContent = "⚠️ Password কমপক্ষে ৮ অক্ষর হতে হবে।";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Creating account...";
+
+    try {
+      // Firebase Auth এ user তৈরি করো
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Firestore এ user data save করো
+      const trialEnd = Date.now() + 2 * 24 * 60 * 60 * 1000; // ২ দিন পরে
+      await setDoc(doc(db, "users", user.uid), {
+        name: name,
+        email: email,
+        uid: user.uid,
+        subscriptionStatus: "trial",
+        trialStart: serverTimestamp(),
+        trialEnd: trialEnd,
+        subscriptionExpiry: null,
+        plan: null,
+        createdAt: serverTimestamp()
+      });
+
+      // Success — modal বন্ধ করো, dashboard দেখাও
+      closeModal("register");
+      showDashboard(user, "trial", trialEnd);
+
+    } catch (error) {
+      errBox.textContent = getErrorMessage(error.code);
+      btn.disabled = false;
+      btn.textContent = "Create Account & Start Trial";
+    }
+  };
+
+  // ── LOGIN ──
+  window.handleLogin = async function () {
+    const email    = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const btn      = document.getElementById("loginBtn");
+    const errBox   = document.getElementById("loginError");
+
+    errBox.textContent = "";
+
+    if (!email || !password) {
+      errBox.textContent = "⚠️ Email ও Password দাও।";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Logging in...";
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Firestore থেকে user data আনো
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        closeModal("login");
+        showDashboard(user, data.subscriptionStatus, data.trialEnd || data.subscriptionExpiry);
+      }
+
+    } catch (error) {
+      errBox.textContent = getErrorMessage(error.code);
+      btn.disabled = false;
+      btn.textContent = "Login";
+    }
+  };
+
+  // ── LOGOUT ──
+  window.handleLogout = async function () {
+    await signOut(auth);
+    hideDashboard();
+  };
+
+  // ── AUTO LOGIN CHECK ──
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        showDashboard(user, data.subscriptionStatus, data.trialEnd || data.subscriptionExpiry);
+      }
+    }
+  });
+
+  // ── DASHBOARD দেখাও ──
+  function showDashboard(user, status, expiry) {
+    document.getElementById("userDashboard").style.display = "block";
+    document.getElementById("navLoginBtn").style.display = "none";
+    document.getElementById("userNameDisplay").textContent = user.displayName || user.email;
+
+    const now = Date.now();
+    let statusText = "";
+    let statusColor = "";
+
+    if (status === "trial") {
+      const hoursLeft = Math.max(0, Math.round((expiry - now) / (1000 * 60 * 60)));
+      if (now < expiry) {
+        statusText  = `🟡 Free Trial — ${hoursLeft} ঘণ্টা বাকি`;
+        statusColor = "#FF8C00";
+      } else {
+        statusText  = "🔴 Trial Expired — Subscription কিনুন";
+        statusColor = "#cc0000";
+      }
+    } else if (status === "active") {
+      const expiryDate = new Date(expiry).toLocaleDateString("en-BD");
+      statusText  = `🟢 Active — ${expiryDate} পর্যন্ত`;
+      statusColor = "#00C851";
+    } else {
+      statusText  = "🔴 No Subscription";
+      statusColor = "#cc0000";
+    }
+
+    document.getElementById("subStatusText").textContent  = statusText;
+    document.getElementById("subStatusText").style.color  = statusColor;
+  }
+
+  function hideDashboard() {
+    document.getElementById("userDashboard").style.display = "none";
+    document.getElementById("navLoginBtn").style.display  = "block";
+  }
+
+  // ── ERROR MESSAGES ──
+  function getErrorMessage(code) {
+    const messages = {
+      "auth/email-already-in-use"  : "⚠️ এই email দিয়ে আগেই account আছে।",
+      "auth/invalid-email"         : "⚠️ Email address সঠিক নয়।",
+      "auth/weak-password"         : "⚠️ Password আরও strong করো।",
+      "auth/user-not-found"        : "⚠️ এই email দিয়ে কোনো account নেই।",
+      "auth/wrong-password"        : "⚠️ Password ভুল।",
+      "auth/invalid-credential"    : "⚠️ Email বা Password ভুল।",
+      "auth/too-many-requests"     : "⚠️ অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করো।",
+      "auth/network-request-failed": "⚠️ Internet connection check করো।",
+    };
+    return messages[code] || "⚠️ কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করো।";
+  }
+  // Current user global save
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      window.currentUser = user;
+    } else {
+      window.currentUser = null;
+    }
+  });
+</script>
+<script>
+// ── PAYMENT SYSTEM (Manual Crypto) ──
+const USDT_ADDRESS = "TPurtMuwYs2zk3tX56dTserLxkKEXULtJy";
+const SUPPORT_EMAIL = "tradealertpro.info@gmail.com";
+
+const PLANS = {
+  monthly:   { name: "1 Month",  amount: 99,  usd: "1.5",  days: 30  },
+  quarterly: { name: "3 Months", amount: 149, usd: "2.0",  days: 90  },
+  biannual:  { name: "6 Months", amount: 299, usd: "3.5",  days: 180 },
+  yearly:    { name: "1 Year",   amount: 499, usd: "6.0",  days: 365 }
+};
+
+window.openPayment = function(planKey) {
+  const user = window.currentUser;
+  if (!user) {
+    alert("⚠️ আগে Login করো।");
+    openModal('login');
+    return;
+  }
+
+  const plan = PLANS[planKey];
+
+  // Step reset
+  document.getElementById("payStep1").style.display = "block";
+  document.getElementById("payStep2").style.display = "none";
+  document.getElementById("payStep3").style.display = "none";
+
+  document.getElementById("paymentModal").classList.add("open");
+  document.getElementById("selectedPlanName").textContent   = plan.name;
+  document.getElementById("selectedPlanAmount").textContent =
+    `৳${plan.amount} (~$${plan.usd} USDT)`;
+  document.getElementById("payPlanKey").value = planKey;
+  document.body.style.overflow = "hidden";
+};
+
+window.closePayment = function() {
+  document.getElementById("paymentModal").classList.remove("open");
+  document.body.style.overflow = "";
+};
+
+window.showPaymentAddress = function() {
+  const planKey = document.getElementById("payPlanKey").value;
+  const plan    = PLANS[planKey];
+
+  document.getElementById("payStep1").style.display = "none";
+  document.getElementById("payStep2").style.display = "block";
+
+  // Plan info
+  document.getElementById("payPlanDisplay").textContent  = plan.name;
+  document.getElementById("payUsdAmount").textContent    = `$${plan.usd} USDT (TRC20)`;
+  document.getElementById("payBdtAmount").textContent    = `৳${plan.amount} BDT`;
+
+  // USDT Address
+  document.getElementById("usdtAddress").textContent = USDT_ADDRESS;
+
+  // QR Code (Google Charts)
+  const qrUrl = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${USDT_ADDRESS}&choe=UTF-8`;
+  document.getElementById("payQrCode").src = qrUrl;
+
+  // Email subject & body pre-fill
+  const subject = encodeURIComponent(
+    `TradeAlert Pro Payment - ${plan.name} - ${window.currentUser.email}`
+  );
+  const body = encodeURIComponent(
+    `Plan: ${plan.name}\n` +
+    `Amount: $${plan.usd} USDT\n` +
+    `Email: ${window.currentUser.email}\n` +
+    `User ID: ${window.currentUser.uid}\n\n` +
+    `[এখানে payment screenshot attach করুন]`
+  );
+  document.getElementById("emailBtn").href =
+    `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
+};
+
+window.copyAddress = function() {
+  navigator.clipboard.writeText(USDT_ADDRESS);
+  const btn = document.getElementById("copyBtn");
+  btn.textContent = "✅ Copied!";
+  setTimeout(() => { btn.textContent = "📋 Copy Address"; }, 2000);
+};
+
+window.confirmPayment = function() {
+  const confirmed = confirm(
+    "আপনি কি সত্যিই payment করেছেন এবং screenshot email করেছেন?"
+  );
+  if (confirmed) {
+    document.getElementById("payStep2").style.display = "none";
+    document.getElementById("payStep3").style.display = "block";
+  }
+};
+</script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9PJFFYRT76"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9PJFFYRT76');
+</script>
+
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <div class="nav-logo">
+    <img src="logo2.png" style="width:32px; height:32px; border-radius:8px;"/>
+    TradeAlert Pro
+  </div>
+  <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li>
+  <a href="#" id="navLoginBtn" class="nav-cta" onclick="openModal('login')">
+    Login
+  </a>
+</li>
+  </ul>
+</nav>
+<!-- User Dashboard Bar -->
+<div id="userDashboard" style="
+  display: none;
+  background: #1C1C1C;
+  border-bottom: 1px solid rgba(255,107,0,0.15);
+  padding: 10px 40px;
+  margin-top: 64px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+">
+  <div style="font-size:14px; color:#aaa;">
+    👤 <strong id="userNameDisplay" style="color:#fff;"></strong>
+  </div>
+  <div style="font-size:14px;" id="subStatusText"></div>
+  <div style="display:flex; gap:10px;">
+    <a href="#pricing" style="
+      background: linear-gradient(135deg,#FF6B00,#FF8C00);
+      color:#fff; padding:7px 16px;
+      border-radius:8px; font-size:13px;
+      font-weight:700;
+    ">⚡ Upgrade</a>
+    <button onclick="handleLogout()" style="
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.1);
+      color:#888; padding:7px 16px;
+      border-radius:8px; font-size:13px;
+      cursor:pointer;
+    ">Logout</button>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Live Economic Calendar Alerts
+  </div>
+
+  <h1>
+    Know the news<br/>
+    <span class="highlight">before it moves</span><br/>
+    the market.
+  </h1>
+
+  <p class="hero-sub">
+    TradeAlert Pro notifies you 5–10 minutes before high-impact Forex news releases — so you enter or exit before the volatility hits.
+  </p>
+
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="openModal('register')">
+      ⚡ Start Free Trial — 2 Days Free
+    </button>
+    <button class="btn-secondary" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">
+      See How It Works →
+    </button>
+  </div>
+
+  <p class="hero-note">No credit card needed · <span>2 days free</span> · Cancel anytime</p>
+
+  <!-- Notification Mockup -->
+  <div class="mockup-wrap">
+    <div class="notification-card">
+      <img src="logo2.png" style="width:32px; height:32px; border-radius:8px;"/>
+      <div class="notif-body">
+        <div class="notif-title">TRADEALERT PRO · HIGH IMPACT</div>
+        <div class="notif-main">🇺🇸 USD — Non-Farm Payrolls</div>
+        <div class="notif-time">⏰ Time: 08:30 PM · ⏳ 7 minutes away</div>
+      </div>
+    </div>
+    <div class="notif-badge">🔴 LIVE ALERT</div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num">5–10</div>
+    <div class="stat-label">Minutes early warning</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">50+</div>
+    <div class="stat-label">Currency pairs tracked</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">High-impact events covered</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">24/7</div>
+    <div class="stat-label">Always monitoring</div>
+  </div>
+</div>
+
+<!-- ── HOW IT WORKS ── -->
+<section id="how">
+  <div class="section-inner">
+    <div class="section-eyebrow">How It Works</div>
+    <h2 class="section-title">Simple. Fast. Reliable.</h2>
+    <p class="section-sub">Three steps from install to your first alert — takes under 2 minutes.</p>
+
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="step-num">STEP 01</div>
+        <div class="step-icon">🔧</div>
+        <div class="step-title">Install the Extension</div>
+        <div class="step-desc">Download from Chrome Web Store and add to your browser in one click. No setup required.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">STEP 02</div>
+        <div class="step-icon">🔑</div>
+        <div class="step-title">Create Your Account</div>
+        <div class="step-desc">Register and get instant 2-day free trial access. No payment info needed to start.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">STEP 03</div>
+        <div class="step-icon">🔔</div>
+        <div class="step-title">Get Alerts Automatically</div>
+        <div class="step-desc">The extension monitors the economic calendar 24/7 and pushes Chrome notifications 5–10 min before each event.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">STEP 04</div>
+        <div class="step-icon">📈</div>
+        <div class="step-title">Trade With Confidence</div>
+        <div class="step-desc">React before the candle moves. Position yourself ahead of volatility, not after it.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section id="features" class="features-bg">
+  <div class="section-inner">
+    <div class="section-eyebrow">Features</div>
+    <h2 class="section-title">Everything a news trader needs.</h2>
+    <p class="section-sub">Built specifically for Forex traders who trade around economic events.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Early Warning System</div>
+        <div class="feature-desc">Alerts arrive 5 to 10 minutes before the news drops — giving you time to plan your entry or exit without rushing.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔴</div>
+        <div class="feature-title">High Impact Only</div>
+        <div class="feature-desc">No noise. Only High-impact events are flagged — NFP, CPI, Interest Rate decisions, and more.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <div class="feature-title">All Major Currencies</div>
+        <div class="feature-desc">USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD — all tracked with currency flags for instant recognition.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖥️</div>
+        <div class="feature-title">Chrome Native Notifications</div>
+        <div class="feature-desc">Alerts appear as standard Chrome system notifications — visible even when you're on a different tab or window.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <div class="feature-title">Daily News Dashboard</div>
+        <div class="feature-desc">Open the extension popup to see today's full economic calendar sorted by time, at a glance.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Subscription Protected</div>
+        <div class="feature-desc">Your account and subscription status is checked in real time. No subscription sharing or abuse.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LIVE NEWS SECTION ── -->
+<section id="live-news" style="background: #0D0D0D;">
+  <div class="section-inner">
+    <div class="section-eyebrow">Live Feed</div>
+    <h2 class="section-title">আজকের High Impact News</h2>
+    <p class="section-sub">Real-time economic calendar — সরাসরি Forex Factory থেকে।</p>
+
+    <!-- News Grid -->
+    <div id="websiteNewsList" style="
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    ">
+      <div style="text-align:center; color:#555; padding:40px;
+                  grid-column: 1/-1; font-size:14px;">
+        ⏳ News load হচ্ছে...
+      </div>
+    </div>
+
+    <!-- Last Updated -->
+    <div id="lastUpdated" style="
+      text-align: center;
+      font-size: 12px;
+      color: #444;
+      margin-top: 20px;
+    "></div>
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<!-- ── PRICING ── -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-eyebrow">Pricing</div>
+    <h2 class="section-title">Simple, honest pricing.</h2>
+    <p class="section-sub">Start free for 2 days. No card needed.</p>
+
+    <!-- Offer Banner -->
+    <div id="offerBanner" style="
+      display: none;
+      background: linear-gradient(135deg, #FF6B00, #FF8C00);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-top: 24px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    "></div>
+
+    <!-- Payment Methods -->
+    <div style="
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    ">
+      <div style="
+        background: #1C1C1C;
+        border: 1px solid rgba(255,107,0,0.2);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 12px;
+        color: #aaa;
+      ">💰 bKash / Nagad গ্রহণযোগ্য</div>
+      <div style="
+        background: #1C1C1C;
+        border: 1px solid rgba(255,107,0,0.2);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 12px;
+        color: #aaa;
+      ">₿ Crypto (USDT TRC20) গ্রহণযোগ্য</div>
+    </div>
+
+    <!-- Pricing Grid -->
+    <div class="pricing-grid" id="pricingGrid">
+      <!-- JS দিয়ে load হবে -->
+      <div style="
+        grid-column: 1/-1;
+        text-align: center;
+        color: #555;
+        padding: 40px;
+      ">⏳ Loading...</div>
+    </div>
+
+    <!-- Payment Info -->
+    <div style="
+      margin-top: 24px;
+      background: #141414;
+      border: 1px solid rgba(255,107,0,0.15);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 13px;
+      color: #888;
+      line-height: 1.8;
+      text-align: center;
+    ">
+      📱 <strong style="color:#FF6B00;">bKash/Nagad:</strong>
+      01725046234 নম্বরে Send Money করো<br/>
+      ₿ <strong style="color:#FF6B00;">Crypto:</strong>
+      USDT TRC20 — TPurtMuwYs2zk3tX56dTserLxkKEXULtJy<br/>
+      📧 Payment এর পরে screenshot পাঠাও:
+      <strong style="color:#FF6B00;">
+        tradealertpro.info@gmail.com
+      </strong><br/>
+      ⏰ ২৪ ঘণ্টার মধ্যে activate হবে
+    </div>
+  </div>
+</section>
+
+<!-- ── PAYMENT ── -->
+<section class="payment-section">
+  <div class="section-inner">
+    <div class="section-eyebrow">Payment</div>
+    <h2 class="section-title">Pay with Crypto — anywhere in the world.</h2>
+    <p class="section-sub">Fast, secure, and borderless. No bank required.</p>
+
+    <div class="payment-cards">
+      <div class="payment-card">
+        <div class="payment-logo">₿</div>
+        <div class="payment-name">Crypto Payment</div>
+        <div class="payment-desc">Pay using any major cryptocurrency. Works for both Bangladeshi and international users. Powered by NOWPayments.</div>
+        <div class="crypto-list">
+          <span class="crypto-tag">USDT</span>
+          <span class="crypto-tag">BTC</span>
+          <span class="crypto-tag">ETH</span>
+          <span class="crypto-tag">BNB</span>
+          <span class="crypto-tag">TRX</span>
+          <span class="crypto-tag">+ more</span>
+        </div>
+      </div>
+      <div class="payment-card">
+        <div class="payment-logo">🔒</div>
+        <div class="payment-name">Secure & Instant</div>
+        <div class="payment-desc">Your subscription activates automatically within minutes of payment confirmation on the blockchain.</div>
+        <div class="crypto-list">
+          <span class="crypto-tag">✓ Instant activation</span>
+          <span class="crypto-tag">✓ No chargebacks</span>
+          <span class="crypto-tag">✓ Anonymous</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section id="faq">
+  <div class="section-inner">
+    <div class="section-eyebrow">FAQ</div>
+    <h2 class="section-title">Common questions.</h2>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How does the 2-day free trial work?
+          <span class="faq-arrow">+</span>
+        </div>
+        <div class="faq-a">After registering, you get full access to all alerts for 48 hours — no payment or card required. After the trial, you choose a subscription plan to continue.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Which news events trigger alerts?
+          <span class="faq-arrow">+</span>
+        </div>
+        <div class="faq-a">Only High-Impact events from the Forex Factory economic calendar — such as NFP, CPI, Interest Rate Decisions, GDP, and other major releases. Low and medium impact events are filtered out.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How exactly are notifications delivered?
+          <span class="faq-arrow">+</span>
+        </div>
+        <div class="faq-a">The Chrome extension runs in the background and checks the calendar every minute. When a high-impact event is 5–10 minutes away, a Chrome system notification appears on your screen — even if you're on another tab.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Can I use it from outside Bangladesh?
+          <span class="faq-arrow">+</span>
+        </div>
+        <div class="faq-a">Yes. TradeAlert Pro works globally. Payment is via crypto so there are no geographic restrictions. The extension works in any country where Chrome is available.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What crypto coins can I use to pay?
+          <span class="faq-arrow">+</span>
+        </div>
+        <div class="faq-a">We accept USDT (TRC20/ERC20), BTC, ETH, BNB, TRX, and many more via NOWPayments. USDT TRC20 is recommended for the lowest fees.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Does it work when Chrome is minimized?
+          <span class="faq-arrow">+</span>
+        </div>
+        <div class="faq-a">Yes. As long as Chrome is running (even minimized), the background service worker keeps monitoring and will push notifications to your desktop.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA BANNER ── -->
+<div class="cta-banner">
+  <h2>Start trading the news smarter.</h2>
+  <p>2-day free trial · No card needed · Cancel anytime</p>
+  <button class="btn-white" onclick="openModal('register')">⚡ Get Free Access Now</button>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo">
+        <div class="bolt">⚡</div>
+        TradeAlert Pro
+      </div>
+      <p class="footer-tagline">The fastest way to stay ahead of high-impact Forex news.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#">Download Extension</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Account</h4>
+      <ul>
+        <li><a href="#" onclick="openModal('register')">Register</a></li>
+        <li><a href="#" onclick="openModal('login')">Login</a></li>
+        <li><a href="#">Dashboard</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Refund Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 <span>TradeAlert Pro</span>. All rights reserved.</div>
+    <div class="footer-copy">Made for Forex traders 🌍</div>
+  </div>
+</footer>
+
+<!-- ── REGISTER MODAL ── -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('register')">✕</button>
+    <h3>Create Account</h3>
+    <p class="modal-sub">Start your 2-day free trial instantly.</p>
+    <div class="trial-notice">🎉 2 Days FREE — No payment required</div>
+
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input type="text" id="regName" class="form-input" placeholder="Your name"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" id="regEmail" class="form-input" placeholder="you@email.com"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="regPassword" class="form-input" placeholder="Minimum 8 characters"/>
+    </div>
+    <div id="regError" style="color:#cc0000; font-size:13px; margin-bottom:8px;"></div>
+    <button id="regBtn" class="modal-btn" onclick="handleRegister()">
+      Create Account & Start Trial
+    </button>
+    <div class="modal-switch">
+      Already have an account?
+      <a onclick="switchModal('register','login')">Login here</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOGIN MODAL ── -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('login')">✕</button>
+    <h3>Welcome back</h3>
+    <p class="modal-sub">Login to your TradeAlert Pro account.</p>
+
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" id="loginEmail" class="form-input" placeholder="you@email.com"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="loginPassword" class="form-input" placeholder="Your password"/>
+    </div>
+    <div id="loginError" style="color:#cc0000; font-size:13px; margin-bottom:8px;"></div>
+    <button id="loginBtn" class="modal-btn" onclick="handleLogin()">Login</button>
+    <div class="modal-switch">
+      Don't have an account?
+      <a onclick="switchModal('login','register')">Register free</a>
+    </div>
+  </div>
+</div>
+<!-- ── PAYMENT MODAL ── -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal" style="max-width:460px;">
+    <button class="modal-close" onclick="closePayment()">✕</button>
+
+    <!-- Step 1: Plan Confirm -->
+    <div id="payStep1">
+      <h3>Payment করো</h3>
+      <p class="modal-sub">
+        Plan: <strong id="selectedPlanName"></strong> —
+        <strong id="selectedPlanAmount"></strong>
+      </p>
+
+      <div style="
+        background: rgba(255,107,0,0.08);
+        border: 1px solid rgba(255,107,0,0.2);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+      ">
+        <div style="font-size:13px; color:#aaa; line-height:1.8;">
+          ✅ USDT TRC20 দিয়ে payment করো<br/>
+          ✅ Payment এর screenshot email করো<br/>
+          ✅ আমরা verify করে ২৪ ঘণ্টার মধ্যে activate করব<br/>
+          ✅ Binance, Bybit যেকোনো exchange থেকে পাঠাতে পারবে
+        </div>
+      </div>
+
+      <input type="hidden" id="payPlanKey"/>
+      <button class="modal-btn" onclick="showPaymentAddress()">
+        ⚡ Payment Address দেখাও
+      </button>
+    </div>
+
+    <!-- Step 2: Address + QR -->
+    <div id="payStep2" style="display:none;">
+      <h3>USDT পাঠাও</h3>
+      <p class="modal-sub">নিচের address এ USDT TRC20 পাঠাও</p>
+
+      <!-- Plan & Amount -->
+      <div style="
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+      ">
+        <div style="
+          flex: 1;
+          background: #1C1C1C;
+          border-radius: 10px;
+          padding: 12px;
+          text-align: center;
+        ">
+          <div style="font-size:11px; color:#555; margin-bottom:4px;">
+            PLAN
+          </div>
+          <div id="payPlanDisplay"
+               style="font-size:14px; font-weight:700; color:#FF6B00;">
+          </div>
+        </div>
+        <div style="
+          flex: 1;
+          background: #1C1C1C;
+          border-radius: 10px;
+          padding: 12px;
+          text-align: center;
+        ">
+          <div style="font-size:11px; color:#555; margin-bottom:4px;">
+            AMOUNT
+          </div>
+          <div id="payUsdAmount"
+               style="font-size:14px; font-weight:700; color:#fff;">
+          </div>
+          <div id="payBdtAmount"
+               style="font-size:11px; color:#666; margin-top:2px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- QR Code -->
+      <div style="text-align:center; margin-bottom:16px;">
+        <img id="payQrCode" src="" alt="QR Code" style="
+          width: 160px;
+          height: 160px;
+          border-radius: 12px;
+          background: #fff;
+          padding: 8px;
+        "/>
+        <div style="font-size:11px; color:#555; margin-top:8px;">
+          QR Code scan করো অথবা নিচের address copy করো
+        </div>
+      </div>
+
+      <!-- Network Warning -->
+      <div style="
+        background: rgba(204,0,0,0.1);
+        border: 1px solid rgba(204,0,0,0.25);
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 12px;
+        font-size: 12px;
+        color: #ff6666;
+        text-align: center;
+        font-weight: 600;
+      ">
+        ⚠️ শুধুমাত্র TRC20 Network এ পাঠাও।
+        অন্য network এ পাঠালে টাকা হারিয়ে যাবে!
+      </div>
+
+      <!-- Address Box -->
+      <div style="
+        background: #1C1C1C;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+      ">
+        <div style="font-size:10px; color:#555; margin-bottom:6px;
+                    letter-spacing:1px;">
+          USDT TRC20 ADDRESS
+        </div>
+        <div id="usdtAddress" style="
+          font-size: 12px;
+          color: #fff;
+          word-break: break-all;
+          font-family: 'JetBrains Mono', monospace;
+          line-height: 1.6;
+        "></div>
+      </div>
+
+      <!-- Copy Button -->
+      <button id="copyBtn" onclick="copyAddress()" class="modal-btn"
+              style="margin-bottom:12px;">
+        📋 Copy Address
+      </button>
+
+      <!-- Divider -->
+      <div style="
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      ">
+        <div style="flex:1; height:1px; background:rgba(255,255,255,0.07);"></div>
+        <div style="font-size:12px; color:#444;">Payment করার পরে</div>
+        <div style="flex:1; height:1px; background:rgba(255,255,255,0.07);"></div>
+      </div>
+
+      <!-- Email Screenshot -->
+      <a id="emailBtn" href="#" class="modal-btn" style="
+        display: block;
+        text-align: center;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border: 1px solid rgba(255,107,0,0.3);
+      ">
+        📧 Screenshot Email করো
+      </a>
+
+      <div style="font-size:12px; color:#555; text-align:center;
+                  margin-bottom:16px; line-height:1.6;">
+        Email: <span style="color:#FF6B00;">tradealertpro.info@gmail.com</span><br/>
+        Subject এ তোমার email ও plan এর নাম লিখো
+      </div>
+
+      <!-- Confirm Button -->
+      <button onclick="confirmPayment()" style="
+        width: 100%;
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #666;
+        padding: 11px;
+        border-radius: 10px;
+        font-size: 13px;
+        cursor: pointer;
+      ">
+        ✅ আমি payment করেছি এবং screenshot পাঠিয়েছি
+      </button>
+    </div>
+
+    <!-- Step 3: Confirmation -->
+    <div id="payStep3" style="display:none; text-align:center; padding:10px 0;">
+      <div style="font-size:56px; margin-bottom:16px;">📧</div>
+      <h3 style="margin-bottom:10px;">ধন্যবাদ!</h3>
+      <p style="font-size:14px; color:#aaa; line-height:1.7;
+                margin-bottom:20px;">
+        তোমার payment verify করা হবে এবং<br/>
+        <strong style="color:#FF6B00;">২৪ ঘণ্টার মধ্যে</strong>
+        subscription activate হবে।<br/>
+        Confirmation email পাঠানো হবে।
+      </p>
+
+      <div style="
+        background: rgba(255,107,0,0.08);
+        border: 1px solid rgba(255,107,0,0.2);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        color: #aaa;
+        text-align: left;
+        line-height: 1.8;
+      ">
+        📧 Email: <span style="color:#FF6B00;">tradealertpro.info@gmail.com</span><br/>
+        ⏰ Activation: ২৪ ঘণ্টার মধ্যে<br/>
+        💬 সমস্যা হলে email করো
+      </div>
+
+      <button class="modal-btn" onclick="closePayment()">
+        ঠিক আছে
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── MODAL ──
+  function openModal(type) {
+    document.getElementById(type + 'Modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(type) {
+    document.getElementById(type + 'Modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function switchModal(from, to) {
+    closeModal(from);
+    setTimeout(() => openModal(to), 150);
+  }
+
+  // Close on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+
+  // ── FAQ ──
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // ── NAVBAR SCROLL ──
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 40) {
+      nav.style.borderBottomColor = 'rgba(255,107,0,0.15)';
+    } else {
+      nav.style.borderBottomColor = 'rgba(255,255,255,0.06)';
+    }
+  });
+</script>
+<script>
+  
+// ── WEBSITE LIVE NEWS ──
+async function loadWebsiteNews() {
+  const container   = document.getElementById("websiteNewsList");
+  const lastUpdated = document.getElementById("lastUpdated");
+
+  try {
+    // Firestore থেকে news আনো
+    const { initializeApp }         = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+    const newsApp = initializeApp({
+      apiKey:            "AIzaSyAWRZfzHpwCId-vpTY33s97jFV0I3KDXRw",
+      authDomain:        "tradealert-pro.firebaseapp.com",
+      projectId:         "tradealert-pro",
+      storageBucket:     "tradealert-pro.firebasestorage.app",
+      messagingSenderId: "1054738160092",
+      appId:             "1:1054738160092:web:57d9dc5204b64b8f7d9719"
+    }, "newsInstance");
+
+    const newsDb = getFirestore(newsApp);
+    const snap   = await getDoc(doc(newsDb, "settings", "news"));
+
+    if (!snap.exists()) {
+      container.innerHTML = `
+        <div style="text-align:center; color:#555; padding:40px;
+                    grid-column:1/-1; font-size:14px;">
+          📅 আজকে কোনো news নেই
+        </div>`;
+      return;
+    }
+
+    const allEvents = snap.data().items || [];
+
+    // আজকের events filter করো
+    const today    = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const todayEvents = allEvents
+      .filter(e => {
+        const d = new Date(e.date);
+        return d >= today && d < tomorrow;
+      })
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    if (todayEvents.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; color:#555; padding:40px;
+                    grid-column:1/-1; font-size:14px;">
+          🎉 আজকে কোনো High Impact News নেই
+        </div>`;
+      return;
+    }
+
+    const flags = {
+      USD:"🇺🇸", EUR:"🇪🇺", GBP:"🇬🇧",
+      JPY:"🇯🇵", AUD:"🇦🇺", CAD:"🇨🇦",
+      CHF:"🇨🇭", NZD:"🇳🇿", CNY:"🇨🇳"
+    };
+
+    container.innerHTML = todayEvents.map(event => {
+      const eventTime    = new Date(event.date);
+      const timeStr      = eventTime.toLocaleTimeString("en-US", {
+        hour: "2-digit", minute: "2-digit", hour12: true
+      });
+      const minutesUntil =
+        Math.round((eventTime - new Date()) / (1000 * 60));
+
+      let timeLabel = "";
+      let dotColor  = "#FF6B00";
+
+      if (minutesUntil < 0) {
+        timeLabel = "✅ Released";
+        dotColor  = "#555";
+      } else if (minutesUntil <= 10) {
+        timeLabel = `🔴 ${minutesUntil} মিনিট পরে!`;
+        dotColor  = "#cc0000";
+      } else if (minutesUntil <= 30) {
+        timeLabel = `🟡 ${minutesUntil} মিনিট পরে`;
+        dotColor  = "#FF8C00";
+      } else {
+        timeLabel = `⏰ ${minutesUntil} মিনিট পরে`;
+        dotColor  = "#FF6B00";
+      }
+
+      const impactColor = event.impact === "High"   ? "#cc0000" :
+                          event.impact === "Medium" ? "#FF8C00" : "#555";
+
+      return `
+        <div style="
+          background: #141414;
+          border: 1px solid rgba(255,107,0,0.12);
+          border-left: 3px solid ${dotColor};
+          border-radius: 12px;
+          padding: 20px;
+        ">
+          <div style="display:flex; justify-content:space-between;
+                      margin-bottom:10px;">
+            <div style="font-size:13px; font-weight:700; color:#FF8C00;">
+              ${flags[event.currency] || "🌍"} ${event.currency}
+            </div>
+            <span style="
+              background: ${impactColor};
+              color: #fff; font-size: 9px;
+              font-weight: 700; padding: 3px 8px;
+              border-radius: 4px;
+            ">${event.impact} IMPACT</span>
+          </div>
+          <div style="font-size:14px; font-weight:600;
+                      color:#fff; margin-bottom:12px;">
+            ${event.title}
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <div style="font-size:12px; color:#666;">
+              🕐 ${timeStr}
+            </div>
+            <div style="font-size:12px; font-weight:600;
+                        color:${dotColor};">
+              ${timeLabel}
+            </div>
+          </div>
+          ${event.forecast || event.previous ? `
+          <div style="display:flex; gap:16px; margin-top:10px;
+                      padding-top:10px;
+                      border-top:1px solid rgba(255,255,255,0.05);">
+            ${event.forecast ? `
+            <div>
+              <div style="font-size:10px; color:#555;">FORECAST</div>
+              <div style="font-size:12px; color:#aaa;
+                          font-weight:600;">${event.forecast}</div>
+            </div>` : ""}
+            ${event.previous ? `
+            <div>
+              <div style="font-size:10px; color:#555;">PREVIOUS</div>
+              <div style="font-size:12px; color:#aaa;
+                          font-weight:600;">${event.previous}</div>
+            </div>` : ""}
+          </div>` : ""}
+        </div>
+      `;
+    }).join("");
+
+    lastUpdated.textContent =
+      `Last updated: ${new Date().toLocaleTimeString("en-US")}`;
+
+  } catch(error) {
+    console.error("News load error:", error);
+    container.innerHTML = `
+      <div style="text-align:center; color:#cc0000; padding:40px;
+                  grid-column:1/-1; font-size:14px;">
+        ❌ News load করতে সমস্যা হচ্ছে।
+      </div>`;
+  }
+}
+
+// Page load হলে news load করো
+loadWebsiteNews();
+
+// প্রতি ১ মিনিটে auto refresh
+setInterval(loadWebsiteNews, 60 * 1000);
+</script>
+
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ✅ Pricing এর জন্য আলাদা Firebase instance
+const pricingConfig = {
+  apiKey:            "AIzaSyAWRZfzHpwCId-vpTY33s97jFV0I3KDXRw",
+  authDomain:        "tradealert-pro.firebaseapp.com",
+  projectId:         "tradealert-pro",
+  storageBucket:     "tradealert-pro.firebasestorage.app",
+  messagingSenderId: "1054738160092",
+  appId:             "1:1054738160092:web:57d9dc5204b64b8f7d9719"
+};
+
+const pricingApp = initializeApp(pricingConfig, "pricingInstance");
+const pricingDb  = getFirestore(pricingApp);
+
+async function loadPricing() {
+  try {
+    const snap = await getDoc(doc(pricingDb, "settings", "pricing"));
+    const data = snap.exists() ? snap.data() : {};
+
+    const p = {
+      monthly_price:   data.monthly_price   || 500,
+      quarterly_price: data.quarterly_price || 1200,
+      biannual_price:  data.biannual_price  || 2000,
+      yearly_price:    data.yearly_price    || 3500,
+      monthly_usd:     data.monthly_usd     || "4.5",
+      quarterly_usd:   data.quarterly_usd   || "11",
+      biannual_usd:    data.biannual_usd    || "18",
+      yearly_usd:      data.yearly_usd      || "32",
+      offer_active:    data.offer_active    || false,
+      offer_text:      data.offer_text      || "",
+      offer_discount:  data.offer_discount  || 0
+    };
+
+    // Offer banner
+    if (p.offer_active && p.offer_text) {
+      const banner = document.getElementById("offerBanner");
+      if (banner) {
+        banner.style.display = "block";
+        banner.textContent   = `🎉 ${p.offer_text}`;
+      }
+    }
+
+    // Discount calculate
+    function discounted(price) {
+      if (p.offer_active && p.offer_discount > 0) {
+        return Math.round(price * (1 - p.offer_discount / 100));
+      }
+      return price;
+    }
+
+    // Pricing cards render
+    const grid = document.getElementById("pricingGrid");
+    if (!grid) return;
+
+    grid.innerHTML = `
+
+      <!-- 1 Month -->
+      <div class="plan-card">
+        <div class="plan-label">1 Month</div>
+        <div class="plan-price">
+          <span class="plan-currency">৳</span>
+          <span class="plan-amount">
+            ${discounted(p.monthly_price)}
+          </span>
+        </div>
+        ${p.offer_active && p.offer_discount > 0 ? `
+        <div style="font-size:12px; color:#888;
+                    text-decoration:line-through;
+                    margin-bottom:4px;">
+          ৳${p.monthly_price}
+        </div>` : ""}
+        <div class="plan-per">~$${p.monthly_usd} USD</div>
+        <hr class="plan-divider"/>
+        <ul class="plan-features">
+          <li>All High-Impact Alerts</li>
+          <li>5–10 min early warning</li>
+          <li>Daily news dashboard</li>
+          <li>bKash / Nagad / Crypto</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline"
+                id="btn_monthly">
+          Get Started
+        </button>
+      </div>
+
+      <!-- 3 Months -->
+      <div class="plan-card">
+        <div class="savings-tag">সাশ্রয়ী</div>
+        <div class="plan-label">3 Months</div>
+        <div class="plan-price">
+          <span class="plan-currency">৳</span>
+          <span class="plan-amount">
+            ${discounted(p.quarterly_price)}
+          </span>
+        </div>
+        ${p.offer_active && p.offer_discount > 0 ? `
+        <div style="font-size:12px; color:#888;
+                    text-decoration:line-through;
+                    margin-bottom:4px;">
+          ৳${p.quarterly_price}
+        </div>` : ""}
+        <div class="plan-per">~$${p.quarterly_usd} USD</div>
+        <hr class="plan-divider"/>
+        <ul class="plan-features">
+          <li>All High-Impact Alerts</li>
+          <li>5–10 min early warning</li>
+          <li>Daily news dashboard</li>
+          <li>bKash / Nagad / Crypto</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline"
+                id="btn_quarterly">
+          Get Started
+        </button>
+      </div>
+
+      <!-- 6 Months -->
+      <div class="plan-card popular">
+        <div class="popular-badge">⭐ Most Popular</div>
+        <div class="savings-tag">সবচেয়ে জনপ্রিয়</div>
+        <div class="plan-label">6 Months</div>
+        <div class="plan-price">
+          <span class="plan-currency">৳</span>
+          <span class="plan-amount">
+            ${discounted(p.biannual_price)}
+          </span>
+        </div>
+        ${p.offer_active && p.offer_discount > 0 ? `
+        <div style="font-size:12px; color:#888;
+                    text-decoration:line-through;
+                    margin-bottom:4px;">
+          ৳${p.biannual_price}
+        </div>` : ""}
+        <div class="plan-per">~$${p.biannual_usd} USD</div>
+        <hr class="plan-divider"/>
+        <ul class="plan-features">
+          <li>All High-Impact Alerts</li>
+          <li>5–10 min early warning</li>
+          <li>Daily news dashboard</li>
+          <li>bKash / Nagad / Crypto</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="plan-btn plan-btn-solid"
+                id="btn_biannual">
+          Get Started
+        </button>
+      </div>
+
+      <!-- 1 Year -->
+      <div class="plan-card">
+        <div class="savings-tag">সর্বোচ্চ সাশ্রয়</div>
+        <div class="plan-label">1 Year</div>
+        <div class="plan-price">
+          <span class="plan-currency">৳</span>
+          <span class="plan-amount">
+            ${discounted(p.yearly_price)}
+          </span>
+        </div>
+        ${p.offer_active && p.offer_discount > 0 ? `
+        <div style="font-size:12px; color:#888;
+                    text-decoration:line-through;
+                    margin-bottom:4px;">
+          ৳${p.yearly_price}
+        </div>` : ""}
+        <div class="plan-per">~$${p.yearly_usd} USD</div>
+        <hr class="plan-divider"/>
+        <ul class="plan-features">
+          <li>All High-Impact Alerts</li>
+          <li>5–10 min early warning</li>
+          <li>Daily news dashboard</li>
+          <li>bKash / Nagad / Crypto</li>
+          <li>Priority support</li>
+          <li>Early access to updates</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline"
+                id="btn_yearly">
+          Get Started
+        </button>
+      </div>
+    `;
+
+    // Button events
+    document.getElementById("btn_monthly")
+      .addEventListener("click",
+        () => window.openPayment("monthly"));
+    document.getElementById("btn_quarterly")
+      .addEventListener("click",
+        () => window.openPayment("quarterly"));
+    document.getElementById("btn_biannual")
+      .addEventListener("click",
+        () => window.openPayment("biannual"));
+    document.getElementById("btn_yearly")
+      .addEventListener("click",
+        () => window.openPayment("yearly"));
+
+  } catch (error) {
+    console.error("Pricing load error:", error);
+    document.getElementById("pricingGrid").innerHTML = `
+      <div style="grid-column:1/-1; text-align:center;
+                  color:#888; padding:20px;">
+        ❌ Pricing load হচ্ছে না। Page refresh করো।
+      </div>`;
+  }
+}
+
+loadPricing();
+</script>
+
+</body>
+</html>
